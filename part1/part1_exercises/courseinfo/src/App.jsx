@@ -1,9 +1,21 @@
 // returns Header component, with printing course name as header
 const Header = (props) => {
-  console.log(`props : ${props.name}`);
+  // console.log(`props : ${props.name}`);
   return (
     <div>
       <h1>{props.name}</h1>
+    </div>
+  );
+};
+const Part = (props) => {
+  // RHS spreads out props into individual arguments, and LHS assigns them in order
+  const { name, exercises } = { ...props };
+  // console.log(exercises);
+  return (
+    <div>
+      <p>
+        {name} {exercises}
+      </p>
     </div>
   );
 };
@@ -13,26 +25,31 @@ const Content = (props) => {
   // console.log(props)
   return (
     <div>
-      <p>{props.parts[0].name} {props.parts[0].exercises}</p>
-      <p>{props.parts[1].name} {props.parts[1].exercises}</p>
-      <p>{props.parts[2].name} {props.parts[2].exercises}</p>
+      {/* ...props.parts[0] takes each index of parts, which is parts[i] = {name:, exercises:} and spreads them out into separate props */}
+      {/* ...props.parts[0] basically is <Part name="Fundammental" exercises=10 /> */}
+      <Part {...props.parts[0]} /> 
+      <Part {...props.parts[1]} />
+      <Part {...props.parts[2]} />
     </div>
   );
 };
 
 // returns total amount of exercises in a course
-const Total = (props) =>{
+const Total = (props) => {
   // console.log(props)
-  const total = props.parts[0].exercises + props.parts[1].exercises + props.parts[2].exercises;
-  return(
+  const total =
+    props.parts[0].exercises +
+    props.parts[1].exercises +
+    props.parts[2].exercises;
+  return (
     <div>
       <p>Total Exercises: {total}</p>
     </div>
-  )
-}
+  );
+};
 const App = () => {
   const courses = {
-    courseName : "Half Stack application development",
+    courseName: "Half Stack application development",
     parts: [
       {
         name: "Fundamentals of React",
@@ -50,10 +67,9 @@ const App = () => {
   };
   return (
     <div>
-      <Header name= {courses.courseName} />
+      <Header name={courses.courseName} />
       <Content parts={courses.parts} />
-      <Total parts={courses.parts}/>
-      {/* <p>Number of exercises {exercises1 + exercises2 + exercises3}</p> */}
+      <Total parts={courses.parts} />
     </div>
   );
 };
