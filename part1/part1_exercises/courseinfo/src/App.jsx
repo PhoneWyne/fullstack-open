@@ -46,7 +46,7 @@ const Total = (props) => {
       <p>Total Exercises: {total}</p>
     </div>
   );
-};
+};  
 const App = () => {
   const courses = {
     courseName: "Half Stack application development",
