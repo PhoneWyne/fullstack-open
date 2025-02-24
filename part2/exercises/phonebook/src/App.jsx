@@ -1,5 +1,9 @@
 import { useState } from "react";
-import Person from "./components/Person";
+// import Person from "./components/Person";
+import Persons from "./components/Persons";
+import PersonForm from "./components/PersonForm";
+import Filter from "./components/Filter";
+
 const App = () => {
   // state to control persons displayed, array of objects
   const [persons, setPersons] = useState([
@@ -30,7 +34,7 @@ const App = () => {
   const handleFilterName = (event) => {
     console.log(`filter input field: ${event.target.value}`);
     setFilterName(event.target.value);
-  }
+  };
   // handle adding new person
   // 2 edge cases, preventing same name, and empty strings
 
@@ -65,40 +69,28 @@ const App = () => {
   };
 
   const filterList = () => {
-    // console.log(`filter Name being handled by filterList(): ${filterName}`);    
-    // const list = persons.filter((person)=> person.name.toLowerCase().includes(filterName.toLowerCase()));
-    // console.log("filtered list: ", list);
-    return persons.filter((person)=> person.name.toLowerCase().includes(filterName.toLowerCase()));
-
+    return persons.filter((person) =>
+      person.name.toLowerCase().includes(filterName.toLowerCase())
+    );
   };
-  // console.log("Results of filterList(): ", filterList());
+
   const filteredPersons = !filterName ? persons : filterList();
-  // console.log("filtered persons: " , filteredPersons);
+
   return (
     <div>
       <h2>Phonebook</h2>
-      <div>
-        filter shown with <input value={filterName} onChange={handleFilterName}/>
-      </div>
+      <Filter filterName={filterName} handleFilterName={handleFilterName}/>
       <h2>Add a new</h2>
-      <form onSubmit={addPerson}>
-        <div>
-          name: <input value={newName} onChange={handleNewName} />
-        </div>
-        <div>
-          number: <input value={newNumber} onChange={handleNewNumber} />
-        </div>
-        <div>
-          <button type="submit">add</button>
-        </div>
-      </form>
+      <PersonForm
+        addPerson={addPerson}
+        newName={newName}
+        handleNewName={handleNewName}
+        newNumber={newNumber}
+        handleNewNumber={handleNewNumber}
+      />
+
       <h2>Numbers</h2>
-      <ul>
-        {filteredPersons.map((person) => (
-          // provide key to list component
-          <Person key={person.id} person={person} />
-        ))}
-      </ul>
+      <Persons filteredPersons={filteredPersons} />
     </div>
   );
 };
