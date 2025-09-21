@@ -1,10 +1,18 @@
 import Person from "./Person";
-const Persons = ({ filteredPersons }) => {
+
+const Persons = ({ 
+  persons,
+  handleDelete
+}) => {
   return (
     <ul>
-      {filteredPersons.map((person) => (
+      {persons.map((person) => (
         // provide key to list component
-        <Person key={person.id} person={person} />
+        <Person 
+          key={person.id} 
+          person={person}
+          handleDelete={handleDelete}
+        />
       ))}
     </ul>
   );

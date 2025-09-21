@@ -23,16 +23,7 @@ const App = () => {
     setNewNumber('');
   }
 
-  const fetchPersons =  () => {
-    numbersService
-      .getAll()
-      .then(newPerson => setPersons(newPerson))
-      .catch(error => console.error("Error in fetching persons: ", error));
-  }
-
-  useEffect(() => {
-    fetchPersons();
-  }, []);
+  
   // update name input field state
   const handleNewName = (event) => {
     console.log(`name input field: ${event.target.value}`);
@@ -49,6 +40,13 @@ const App = () => {
     setFilterName(event.target.value);
   };
 
+  const fetchPersons =  () => {
+    numbersService
+      .getAll()
+      .then(newPerson => setPersons(newPerson))
+      .catch(error => console.error("Error in fetching persons: ", error));
+  }
+
   // handle adding new person
   // 2 edge cases, preventing same name, and empty strings
   // check if person exists before post request is sent
@@ -56,7 +54,7 @@ const App = () => {
     event.preventDefault();
     console.log(event.target);
     // ensure empty string isnt being added
-    if (!newName) {
+    if (!newName || !newNumber) {
       alert("No name entered, enter a name then press add.");
       return;
     }
@@ -79,6 +77,32 @@ const App = () => {
     resetForm()
 
   };
+  
+  // edge case, id might already been deleted by some other user
+  const deletePerson = (event, id) => {
+    // console.dir("button pressed: ", event);
+    console.log("Person ID being deleted: ", id);
+    event.stopPropagation();
+    const personExists = persons.find(person => person.id === id);
+    // console.log("person exists: ", personExists);
+    if(!personExists) {
+      alert("Person has already been deleted");
+      // remove persons from existing list of person, current user might be viewing outdated list, while another user has deleted person
+      setPersons(persons.filter(person => person.id !== id));
+    }
+
+    numbersService
+      .deletePerson(id)
+      .then(deletedPerson => {
+        const newPersons = persons.filter(person => person.id !== deletedPerson.id)
+        setPersons(newPersons)
+      })
+      .catch(error => console.error("Error in deleting person: ", error));
+
+  }
+  useEffect(() => {
+    fetchPersons();
+  }, []);
 
   const filterList = () => {
     return persons.filter((person) =>
@@ -102,7 +126,10 @@ const App = () => {
       />
 
       <h2>Numbers</h2>
-      <Persons filteredPersons={filteredPersons} />
+      <Persons 
+        persons={filteredPersons} 
+        handleDelete={deletePerson}
+      />
     </div>
   );
 };

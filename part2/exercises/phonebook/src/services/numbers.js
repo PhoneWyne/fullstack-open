@@ -13,7 +13,13 @@ const create = newObject => {
     return response.then(response => response.data)
 }
 
+const deletePerson = personId => {
+    const response = axios.delete(`${BASE_URL}/${personId}`);
+    return response.then(response => response.data);
+}
+
 export default {
     getAll,
     create,
+    deletePerson
 }
