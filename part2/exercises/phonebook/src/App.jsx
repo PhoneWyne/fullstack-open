@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
-
+import numbersService from "./services/numbers";
 // import Person from "./components/Person";
 import Persons from "./components/Persons";
 import PersonForm from "./components/PersonForm";
 import Filter from "./components/Filter";
+import numbers from "./services/numbers";
+
+
 const App = () => {
   // state to control persons displayed, array of objects
   const [persons, setPersons] = useState([]);
@@ -16,15 +18,16 @@ const App = () => {
   // state to control filter field
   const [filterName, setFilterName] = useState("");
 
-  const fetchPersons = async () => {
-    try{
-      const response = await axios.get('http://localhost:3001/persons')
-      if(response) {
-        setPersons(response.data);
-      }
-    } catch(error) {
-      console.error("Error in fetching data: ", error);
-    }
+  const resetForm = () => {
+    setNewName('');
+    setNewNumber('');
+  }
+
+  const fetchPersons =  () => {
+    numbersService
+      .getAll()
+      .then(newPerson => setPersons(newPerson))
+      .catch(error => console.error("Error in fetching persons: ", error));
   }
 
   useEffect(() => {
@@ -45,37 +48,36 @@ const App = () => {
     console.log(`filter input field: ${event.target.value}`);
     setFilterName(event.target.value);
   };
+
   // handle adding new person
   // 2 edge cases, preventing same name, and empty strings
-
+  // check if person exists before post request is sent
   const addPerson = (event) => {
     event.preventDefault();
     console.log(event.target);
     // ensure empty string isnt being added
-    if (newName) {
-      console.log(`After submitting, new person name: ${newName}`);
-      const newPerson = {
-        name: newName,
-        number: newNumber,
-        id: persons.length + 1,
-      };
-      // this will hold undefined if new name does not exist already
-      const alreadyAdded = persons.find(
-        (person) => person.name === newPerson.name
-      );
-      if (!alreadyAdded) {
-        console.log("new name does not exist in storage");
-        // create copy of persons array and add newpersons obj to it
-        setPersons(persons.concat(newPerson));
-      } else {
-        alert(`${newName} does exist in storage, try again.`);
-      }
-
-      // reset input field
-      setNewName("");
-    } else {
+    if (!newName) {
       alert("No name entered, enter a name then press add.");
+      return;
     }
+    const alreadyExist = persons.find(
+      (person) => (person.name === newName) && (person.number === newNumber)
+    )
+    if (alreadyExist) {
+      alert("Person with name and number being entered exists, please enter a unique person");
+      resetForm();
+      return;
+    }
+    const newPerson = {
+      name: newName,
+      number: newNumber,
+    }
+    numbersService
+      .create(newPerson)      
+      .then(newPerson => setPersons(persons.concat(newPerson)))
+      .catch(error => console.error("Error in adding new person: ", error))
+    resetForm()
+
   };
 
   const filterList = () => {
