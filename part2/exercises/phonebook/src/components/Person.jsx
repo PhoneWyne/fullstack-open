@@ -4,7 +4,7 @@ const Person = ({
     handleDelete
 }) => {
     const confirmDelete = (event, personId) => {
-        const isDelete = window.confirm(`Do you want to delete ${person.name}?"`)
+        const isDelete = window.confirm(`Do you want to delete ${person.name}?`)
         if(!isDelete) {
             return;
         }

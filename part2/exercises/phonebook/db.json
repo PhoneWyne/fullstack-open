@@ -2,7 +2,7 @@
   "persons": [
     {
       "name": "Arto Hellas",
-      "number": "040-123456",
+      "number": "031459812525",
       "id": "1"
     },
     {
@@ -21,19 +21,9 @@
       "id": "4"
     },
     {
-      "id": "0aa7",
-      "name": "Ahmed Wytne",
-      "number": "1242424242"
-    },
-    {
-      "id": "762a",
-      "name": "Ahmed Wyne",
-      "number": "4561"
-    },
-    {
-      "id": "002d",
-      "name": "Ahmed Wyne",
-      "number": "45612"
+      "id": "f1b2",
+      "name": "Arto Hellas",
+      "number": "0320-476590"
     }
   ]
 }

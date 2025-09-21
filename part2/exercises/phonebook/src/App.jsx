@@ -48,8 +48,6 @@ const App = () => {
   }
 
   // handle adding new person
-  // 2 edge cases, preventing same name, and empty strings
-  // check if person exists before post request is sent
   const addPerson = (event) => {
     event.preventDefault();
     console.log(event.target);
@@ -58,11 +56,36 @@ const App = () => {
       alert("No name entered, enter a name then press add.");
       return;
     }
+    // check to see if person name exists already // ask to replace number if it does
+    // yes => update number, no => return
     const alreadyExist = persons.find(
-      (person) => (person.name === newName) && (person.number === newNumber)
+      (person) => (person.name === newName) 
     )
+    if (!alreadyExist?.number) {
+      alert("No number was entered, enter a number");
+      return;
+    }
     if (alreadyExist) {
-      alert("Person with name and number being entered exists, please enter a unique person");
+      const isReplace = window.confirm(`${newName} is already added to phonebook. Do you want to replace phone number?`)
+      if (!isReplace){
+        alert("Person with name being entered exists, please enter a unique person");
+        resetForm();
+        return;
+      }
+      const updatedPerson = {
+        ...alreadyExist,
+        number: newNumber,
+      }
+
+      numbersService
+        .updatePerson(updatedPerson)
+        .then(updatedPerson => {
+          // remove existing person from persons state and only add updated object
+          const newPersons = persons.map(person => person.id === updatedPerson.id ? updatedPerson : person);
+          setPersons(newPersons);
+        })
+        .catch(error => console.error("Error updating phone number: ", error));
+
       resetForm();
       return;
     }
@@ -84,10 +107,10 @@ const App = () => {
     console.log("Person ID being deleted: ", id);
     event.stopPropagation();
     const personExists = persons.find(person => person.id === id);
-    // console.log("person exists: ", personExists);
+    // current user might be viewing outdated list, while another user has deleted person
     if(!personExists) {
       alert("Person has already been deleted");
-      // remove persons from existing list of person, current user might be viewing outdated list, while another user has deleted person
+      // remove persons from existing list of person,
       setPersons(persons.filter(person => person.id !== id));
     }
 
@@ -100,6 +123,7 @@ const App = () => {
       .catch(error => console.error("Error in deleting person: ", error));
 
   }
+
   useEffect(() => {
     fetchPersons();
   }, []);
