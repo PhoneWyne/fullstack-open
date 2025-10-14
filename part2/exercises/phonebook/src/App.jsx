@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
-import numbersService from "./services/numbers";
+import numbersService from "./services/numbers.js";
 // import Person from "./components/Person";
 import Persons from "./components/Persons";
 import PersonForm from "./components/PersonForm";
 import Filter from "./components/Filter";
-import numbers from "./services/numbers";
-
+import Notification from "./components/Notification";
 
 const App = () => {
   // state to control persons displayed, array of objects
@@ -17,7 +16,10 @@ const App = () => {
   const [newNumber, setNewNumber] = useState("");
   // state to control filter field
   const [filterName, setFilterName] = useState("");
-
+  // state to control messages
+  const [message, setMessage] = useState(null);
+  // state to set states for response - success/error
+  const [responseState, setResponseState] = useState(null);
   const resetForm = () => {
     setNewName('');
     setNewNumber('');
@@ -50,7 +52,6 @@ const App = () => {
   // handle adding new person
   const addPerson = (event) => {
     event.preventDefault();
-    console.log(event.target);
     // ensure empty string isnt being added
     if (!newName || !newNumber) {
       alert("No name entered, enter a name then press add.");
@@ -61,10 +62,11 @@ const App = () => {
     const alreadyExist = persons.find(
       (person) => (person.name === newName) 
     )
-    if (!alreadyExist?.number) {
-      alert("No number was entered, enter a number");
-      return;
-    }
+    // if (!alreadyExist?.number) {
+    //   alert("No number was entered, enter a number");
+    //   return;
+    // }
+    // updating an existing person
     if (alreadyExist) {
       const isReplace = window.confirm(`${newName} is already added to phonebook. Do you want to replace phone number?`)
       if (!isReplace){
@@ -84,7 +86,15 @@ const App = () => {
           const newPersons = persons.map(person => person.id === updatedPerson.id ? updatedPerson : person);
           setPersons(newPersons);
         })
-        .catch(error => console.error("Error updating phone number: ", error));
+        .catch(error => {
+          setMessage(`Information of ${newName} has already been removed from the server.`);
+          setResponseState('errorMsg');
+          
+          setTimeout(() => {
+            setMessage(null);
+            setResponseState(null);
+          }, 5000);
+        });
 
       resetForm();
       return;
@@ -95,7 +105,18 @@ const App = () => {
     }
     numbersService
       .create(newPerson)      
-      .then(newPerson => setPersons(persons.concat(newPerson)))
+      .then(newPerson => {
+        setMessage(`Added ${newPerson.name}`)
+        setResponseState('successMsg');
+
+        // remove message after timeout
+        setTimeout(() => {
+          setMessage(null);
+          setResponseState(null);
+        }, 5000);
+
+        setPersons(persons.concat(newPerson))
+      })
       .catch(error => console.error("Error in adding new person: ", error))
     resetForm()
 
@@ -139,7 +160,14 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Filter filterName={filterName} handleFilterName={handleFilterName}/>
+      <Notification 
+        message={message}
+        className={responseState}
+      />
+      <Filter
+        filterName={filterName} 
+        handleFilterName={handleFilterName}
+      />
       <h2>Add a new</h2>
       <PersonForm
         addPerson={addPerson}
