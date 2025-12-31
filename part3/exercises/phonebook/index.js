@@ -1,4 +1,6 @@
 const express= require('express');
+const morgan = require('morgan');
+const cors = require('cors');
 const app = express();
 
 let persons = [
@@ -26,6 +28,15 @@ let persons = [
 
 // json middleware
 app.use(express.json());
+
+// cors middleware to allow requests from origins // defaults to all origins if no specific one given
+app.use(cors());
+
+// custom logging using morgan
+morgan.token('body', req => {
+    return JSON.stringify(req.body)
+})
+app.use(morgan(':method :url :status - :response-time ms :body'));
 
 app.get('/', (request, response) => {
     response.send("<h1>Hello World</h1>");
@@ -114,7 +125,8 @@ app.post('/api/persons', (request, response) => {
     response.status(200).send(person);
 })
 
-const PORT = 3001;
+
+const PORT = process.env.PORT || 3001;
 
 app.listen(PORT, () => {
     console.log(`Server is running on: https://localhost:${PORT}`)
