@@ -32,6 +32,9 @@ app.use(express.json());
 // cors middleware to allow requests from origins // defaults to all origins if no specific one given
 app.use(cors());
 
+// middleware to serve static page
+app.use(express.static('dist'))
+
 // custom logging using morgan
 morgan.token('body', req => {
     return JSON.stringify(req.body)
